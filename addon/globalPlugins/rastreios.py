@@ -30,12 +30,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         clipboardText = api.getClipData()
         send=GetRastreio(clipboardText)
 #percorrer todos os eventos
-        for i in range(len(send['objetos'][0]['eventos'])):
+        for i in send['objetos'][0]['eventos']:
 #Formatar a data em pt-BR
-            dtHrCriado=send['objetos'][0]['eventos'][i]['dtHrCriado']
+            dtHrCriado=i['dtHrCriado']
             dtHrCriado=dtHrCriado[8:10]+'/'+dtHrCriado[5:7]+'/'+dtHrCriado[0:4]+' '+dtHrCriado[11:13]+':'+dtHrCriado[14:16]
 
-            msgText='{}, em {} {}, {}. Data: {}'.format(send['objetos'][0]['eventos'][i]['descricao'], send['objetos'][0]['eventos'][i]['unidade']['endereco']['cidade'], send['objetos'][0]['eventos'][i]['unidade']['endereco']['uf'], send['objetos'][0]['eventos'][i]['unidade']['tipo'], dtHrCriado)
+            msgText='{}, em {} {}, {}. Data: {}'.format(i['descricao'], i['unidade']['endereco']['cidade'], i['unidade']['endereco']['uf'], i['unidade']['tipo'], dtHrCriado)
             ui.message(str(msgText))
 
 
