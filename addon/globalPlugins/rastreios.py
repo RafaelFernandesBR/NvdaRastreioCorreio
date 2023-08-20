@@ -1,45 +1,41 @@
-import globalPluginHandler
-import ui
-import urllib.request
-import urllib.parse
-import api
 import json
-
-def GetRastreio(code):
-        url ="https://proxyapp.correios.com.br/v1/sro-rastro/{}".format(code)
-        headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 tSafari/537.36'}
-        res = urllib.request.Request(url)
-        res.add_header('user-agent', 'M	ozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36')
-        content = urllib.request.urlopen(res)
-        content=json.load(content)
-        return content
+from urllib.request import urlopen, Request
+import ui
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
-    def script_obterUltimoEvento(self, gesture):
-        clipboardText = api.getClipData()
-        send=GetRastreio(clipboardText)
-#Formatar a data em pt-BR
-        dtHrCriado=send['objetos'][0]['eventos'][0]['dtHrCriado']
-        dtHrCriado=dtHrCriado[8:10]+'/'+dtHrCriado[5:7]+'/'+dtHrCriado[0:4]+' '+dtHrCriado[11:13]+':'+dtHrCriado[14:16]
+    def script_obter_ultimo_evento(self, gesture):
+        clipboard_text = api.getClipData()
+        send = get_rastreio(clipboard_text)
+        evento = send['eventos'][0]
+        if not evento:
+            ui.message("Não foi possível obter os dados da API")
+            return
 
-        msgText='{}, em {} {}, {}. Data: {}'.format(send['objetos'][0]['eventos'][0]['descricao'], send['objetos'][0]['eventos'][0]['unidade']['endereco']['cidade'], send['objetos'][0]['eventos'][0]['unidade']['endereco']['uf'], send['objetos'][0]['eventos'][0]['unidade']['tipo'], dtHrCriado)
+        dt_hr_criado = f"{evento['data']} {evento['hora']}"
+        msg_text = f"{evento['status']}, em {evento['local']}. Data: {dt_hr_criado}"
+        ui.message(msg_text)
 
-        ui.message(str(msgText))
+    def script_todos_eventos(self, gesture):
+        clipboard_text = api.getClipData()
+        send = get_rastreio(clipboard_text)
+        for evento in send['eventos']:
+            dt_hr_criado = f"{evento['data']} {evento['hora']}"
+            msg_text = f"{evento['status']}, em {evento['local']}. Data: {dt_hr_criado}"
+            ui.browseableMessage(msg_text, title="Eventos rastreio")
 
-    def script_TodosEventos(self, gesture):
-        clipboardText = api.getClipData()
-        send=GetRastreio(clipboardText)
-#percorrer todos os eventos
-        for i in send['objetos'][0]['eventos']:
-#Formatar a data em pt-BR
-            dtHrCriado=i['dtHrCriado']
-            dtHrCriado=dtHrCriado[8:10]+'/'+dtHrCriado[5:7]+'/'+dtHrCriado[0:4]+' '+dtHrCriado[11:13]+':'+dtHrCriado[14:16]
-
-            msgText='{}, em {} {}, {}. Data: {}'.format(i['descricao'], i['unidade']['endereco']['cidade'], i['unidade']['endereco']['uf'], i['unidade']['tipo'], dtHrCriado)
-            ui.message(str(msgText))
-
-
-    __gestures={
-        "kb:nvda+e": "obterUltimoEvento",
-        "kb:nvda+control+e": "TodosEventos"
+    __gestures = {
+        "kb:nvda+e": "obter_ultimo_evento",
+        "kb:nvda+control+e": "todos_eventos"
     }
+
+def get_rastreio(code):
+    url = f"http://androidparacegos.com.br/rastrear/{code}"
+    headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 tSafari/537.36'}
+    request = Request(url, headers=headers)
+    response = urlopen(request)
+    data = json.loads(response.read().decode('utf-8'))
+    
+    if not data:
+        raise ValueError("Não foi possível obter os dados da API")
+    
+    return data
