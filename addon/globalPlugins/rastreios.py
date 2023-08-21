@@ -3,7 +3,6 @@ import ui
 import api
 import json
 from urllib.request import urlopen, Request
-import ui
 
 
 def get_rastreio(code):
