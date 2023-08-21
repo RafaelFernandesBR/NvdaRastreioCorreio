@@ -2,7 +2,6 @@ import globalPluginHandler
 from scriptHandler import script
 import ui
 import api
-import json
 from . import requestCorreios as RequestCorreios
 
 
