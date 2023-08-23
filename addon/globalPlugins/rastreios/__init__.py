@@ -6,39 +6,42 @@ from . import requestCorreios as RequestCorreios
 
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
-    scriptCategory = "RastreioCorreios"
+	scriptCategory = "RastreioCorreios"
 
-    @script(
-        description="Obtém o último evento de um código de rastreio.",
-        gestures=["kb:nvda+e"]
-    )
-    def script_obter_ultimo_evento(self, gesture):
-        request = RequestCorreios.RequestCorreios()
-        clipboard_text = api.getClipData()
-        send = request.get_rastreio(clipboard_text)
-        evento = send['eventos'][0]
-        if not evento:
-            ui.message("Não foi possível obter os dados da API")
-            return
+	@script(
+		# Gets the last event of a trace code.
+		description="Obtém o último evento de um código de rastreio.",
+		gestures=["kb:nvda+e"]
+	)
+	def script_Gets_The_Last_Event(self, gesture):
+		request = RequestCorreios.RequestCorreios()
+		clipboardCode = api.getClipData()
+		tracking = request.get_tracking(clipboardCode)
+		evento = tracking['eventos'][0]
+		if not evento:
+			# If events are not returned in the api.
+			ui.message("Não foi possível obter os dados da API")
+			return
 
-        dt_hr_criado = f"{evento['data']} {evento['hora']}"
-        substatus_text = ", ".join(evento['subStatus'])
-        msg_text = f"{evento['status']}, em {evento['local']}, {substatus_text}. Data: {dt_hr_criado}"
-        ui.message(msg_text)
+		Date_And_Time = f"{evento['data']} {evento['hora']}"
+		substatus_text = ", ".join(evento['subStatus'])
+		Complete_Text = f"{evento['status']}, em {evento['local']}, {substatus_text}. Data: {Date_And_Time}"
+		ui.message(Complete_Text)
 
-    @script(
-        description="Obtém todos os eventos de um código de rastreio.",
-        gestures=["kb:nvda+control+e"]
-    )
-    def script_todos_eventos(self, gesture):
-        request = RequestCorreios.RequestCorreios()
-        clipboard_text = api.getClipData()
-        send = request.get_rastreio(clipboard_text)
-        eventos = f"Código: {clipboard_text}\n"
+	@script(
+		# Gets all events for a trace code.
+		description="Obtém todos os eventos de um código de rastreio.",
+		gestures=["kb:nvda+control+e"]
+	)
+	def script_Gets_The_All_Event(self, gesture):
+		request = RequestCorreios.RequestCorreios()
+		clipboard_text = api.getClipData()
+		tracking = request.get_tracking(clipboard_text)
+		events = f"Código: {clipboard_text}\n"
 
-        for evento in send['eventos']:
-            dt_hr_criado = f"{evento['data']} {evento['hora']}"
-            substatus_text = ", ".join(evento['subStatus'])
-            eventos += f"{evento['status']}, em {evento['local']}, {substatus_text}. Data: {dt_hr_criado}\n"
+		for evento in tracking['eventos']:
+			Date_And_Time = f"{evento['data']} {evento['hora']}"
+			substatus_text = ", ".join(evento['subStatus'])
+			events += f"{evento['status']}, em {evento['local']}, {substatus_text}. Data: {Date_And_Time}\n"
 
-        ui.browseableMessage(eventos, title="Eventos rastreio")
+		ui.browseableMessage(events, title="Eventos rastreio")
