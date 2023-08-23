@@ -40,9 +40,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		events = f"Código: {clipboardCode}\n"
 
 		# loop through the events, and add them all to a string.
-		for evento in tracking['eventos']:
-			Date_And_Time = f"{evento['data']} {evento['hora']}"
-			substatus_text = ", ".join(evento['subStatus'])
-			events += f"{evento['status']}, em {evento['local']}, {substatus_text}. Data: {Date_And_Time}\n"
+		for event in tracking['eventos']:
+			Date_And_Time = f"{event['data']} {event['hora']}"
+			substatus_text = ", ".join(event['subStatus'])
+			events += f"{event['status']}, em {event['local']}, {substatus_text}. Data: {Date_And_Time}\n"
 
 		ui.browseableMessage(events, title="Eventos rastreio")
