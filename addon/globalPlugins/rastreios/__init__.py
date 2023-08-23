@@ -35,10 +35,11 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	)
 	def script_Gets_The_All_Event(self, gesture):
 		request = RequestCorreios.RequestCorreios()
-		clipboard_text = api.getClipData()
-		tracking = request.get_tracking(clipboard_text)
-		events = f"Código: {clipboard_text}\n"
+		clipboardCode = api.getClipData()
+		tracking = request.get_tracking(clipboardCode)
+		events = f"Código: {clipboardCode}\n"
 
+		# loop through the events, and add them all to a string.
 		for evento in tracking['eventos']:
 			Date_And_Time = f"{evento['data']} {evento['hora']}"
 			substatus_text = ", ".join(evento['subStatus'])
