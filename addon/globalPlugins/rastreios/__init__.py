@@ -1,9 +1,12 @@
+# -*- coding: UTF-8 -*-
+
 import globalPluginHandler
 from scriptHandler import script
 import ui
 import api
 from . import requestCorreios as RequestCorreios
 import wx
+import gui
 
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
@@ -54,15 +57,23 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		gestures=["kb:nvda+shift+control+e"]
 	)
 	def script_Gets_Events_By_User_Code(self, gesture):
-		request = RequestCorreios.RequestCorreios()
-		user_entered_code = wx.GetTextFromUser("Digite o código de rastreio:", "Código de rastreio")
-		tracking = request.get_tracking(user_entered_code)
-		events = f"Código: {user_entered_code}\n"
+		dlg = wx.TextEntryDialog(
+			gui.mainFrame, "Digite o código de rastreio.", "código de rastreio")
+		code = ""
 
-		# loop through the events, and add them all to a string.
-		for event in tracking['eventos']:
-			Date_And_Time = f"{event['data']} {event['hora']}"
-			substatus_text = ", ".join(event['subStatus'])
-			events += f"{event['status']}, em {event['local']}, {substatus_text}. Data: {Date_And_Time}\n"
+		def callback(result):
+			if result == wx.ID_OK:
+				code = dlg.GetValue()
+				request = RequestCorreios.RequestCorreios()
+				tracking = request.get_tracking(code)
+				events = f"Código: {code}\n"
 
-		ui.browseableMessage(events, title="Eventos rastreio")
+				# loop through the events, and add them all to a string.
+				for event in tracking['eventos']:
+					Date_And_Time = f"{event['data']} {event['hora']}"
+					substatus_text = ", ".join(event['subStatus'])
+					events += f"{event['status']}, em {event['local']}, {substatus_text}. Data: {Date_And_Time}\n"
+
+				ui.browseableMessage(events, title="Eventos rastreio")
+
+		gui.runScriptModalDialog(dlg, callback)
