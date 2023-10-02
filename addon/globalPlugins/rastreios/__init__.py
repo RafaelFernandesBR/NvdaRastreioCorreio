@@ -21,11 +21,14 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		request = RequestCorreios.RequestCorreios()
 		clipboardCode = api.getClipData()
 		tracking = request.get_tracking(clipboardCode)
-		evento = tracking['eventos'][0]
-		if not evento:
+
+		if tracking['quantidade'] == 0:
 			# If events are not returned in the api.
-			ui.message("Não foi possível obter os dados da API")
+			ui.message(
+				"Não foi possível obter os dados do código informado. Se a remeça foi enviada recentimente, aguarde até 24 horas e tente novamente!")
 			return
+
+		evento = tracking['eventos'][0]
 
 		Date_And_Time = f"{evento['data']} {evento['hora']}"
 		substatus_text = ", ".join(evento['subStatus'])
@@ -41,7 +44,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		request = RequestCorreios.RequestCorreios()
 		clipboardCode = api.getClipData()
 		tracking = request.get_tracking(clipboardCode)
-		events = f"Código: {clipboardCode}\n"
+
+		if tracking['quantidade'] == 0:
+			# If events are not returned in the api.
+			ui.message(
+				"Não foi possível obter os dados do código informado. Se a remeça foi enviada recentimente, aguarde até 24 horas e tente novamente!")
+			return
 
 		# loop through the events, and add them all to a string.
 		for event in tracking['eventos']:
@@ -49,7 +57,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 			substatus_text = ", ".join(event['subStatus'])
 			events += f"{event['status']}, em {event['local']}, {substatus_text}. Data: {Date_And_Time}\n"
 
-		ui.browseableMessage(events, title="Eventos rastreio")
+		ui.browseableMessage(events, title=clipboardCode)
 
 	@script(
 		# Gets events for a user-entered trace code.
@@ -66,9 +74,16 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 				code = dlg.GetValue()
 				request = RequestCorreios.RequestCorreios()
 				tracking = request.get_tracking(code)
+
+				if tracking['quantidade'] == 0:
+					# If events are not returned in the api.
+					ui.message(
+						"Não foi possível obter os dados do código informado. Se a remeça foi enviada recentimente, aguarde até 24 horas e tente novamente!")
+					return
+
 				events = f"Código: {code}\n"
 
-				# loop through the events, and add them all to a string.
+		# loop through the events, and add them all to a string.
 				for event in tracking['eventos']:
 					Date_And_Time = f"{event['data']} {event['hora']}"
 					substatus_text = ", ".join(event['subStatus'])
