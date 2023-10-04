@@ -32,7 +32,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             evento = tracking['eventos'][0]
 
             Date_And_Time = f"{evento['data']} {evento['hora']}"
-            subsubstatus_text = ", ".join(evento['subStatus'])
+            substatus_text = ", ".join(evento['subStatus'])
             Complete_Text = f"{evento['status']}, em {evento['local']}, {substatus_text}. Data: {Date_And_Time}"
             ui.message(Complete_Text)
         except Exception as e:
@@ -55,13 +55,15 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                     "Não foi possível obter os dados do código informado. Se a remeça foi enviada recentimente, aguarde até 24 horas e tente novamente!")
                 return
 
+            events = F"código: {clipboardCode}\n"
+
             # loop through the events, and add them all to a string.
             for event in tracking['eventos']:
                 Date_And_Time = f"{event['data']} {event['hora']}"
                 substatus_text = ", ".join(event['subStatus'])
                 events += f"{event['status']}, em {event['local']}, {substatus_text}. Data: {Date_And_Time}\n"
 
-                ui.browseableMessage(events, title=clipboardCode)
+            ui.browseableMessage(events, title=clipboardCode)
         except Exception as e:
             ui.message(str(e))
 
