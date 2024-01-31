@@ -6,7 +6,7 @@ from urllib.error import HTTPError  # Importe a classe HTTPError
 class RequestCorreios:
 	# track an order, with the tracking code.
 	def get_tracking(self, code):
-		url = f"http://androidparacegos.com.br/rastrear/{code}"
+		url = f"http://androidparacegos.com.br:5001/rastrear/{code}"
 		headers = {
 			'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
 		}
